@@ -8,8 +8,9 @@ class SnippetManager:
     @staticmethod  
     def create(title, content, category, is_encrypted=False):
         now = datetime.datetime.now()
+        formated_category = category.lower().title()
         cur.execute("INSERT INTO snippets (title, content, category, is_encrypted, created_at) VALUES (?, ?, ?, ?, ?)", 
-                    (title, content, category, is_encrypted, now))
+                    (title, content, formated_category, is_encrypted, now))
         con.commit()
         return cur.lastrowid
 
@@ -18,10 +19,16 @@ class SnippetManager:
         cur.execute("SELECT * FROM snippets WHERE id == ?", (id,))
         return cur.fetchone()
         
-    @staticmethod
-    def find_by_category(category):
-        cur.execute("SELECT * FROM snippets WHERE category == ?", (category,))
-        return cur.fetchall()
+    @classmethod
+    def find_by_category(cl,category):
+        if category == "All":
+            res = cl.find_all()
+            return res
+        else:
+            formated_category = category.lower().title()
+            cur.execute("SELECT * FROM snippets WHERE category == ?", (formated_category,))
+            res_cat = cur.fetchall()
+            return res_cat
     
     @staticmethod
     def search_by_content(str):
@@ -38,9 +45,17 @@ class SnippetManager:
         return cur.fetchall()
     
     @staticmethod
+    def get_categories():
+        cur.execute("SELECT category FROM snippets")
+        raw_cat = cur.fetchall()
+        unique_categories = set(category[0] for category in raw_cat)
+        return unique_categories
+    
+    @staticmethod
     def update(id, title=None, content=None, category=None, is_encrypted=None):
         """Update snippet by ID, only updating provided fields."""
         now = datetime.datetime.now()
+        formated_category = category.lower().title()
     
         cur.execute("""
             UPDATE snippets 
@@ -51,7 +66,7 @@ class SnippetManager:
                 is_encrypted = COALESCE(?, is_encrypted),
                 created_at = ?
             WHERE id == ?
-        """, (title, content, category, is_encrypted, now, id))
+        """, (title, content, formated_category, is_encrypted, now, id))
         
         con.commit()
         print(f"Snippet {id} updated.")
@@ -68,5 +83,14 @@ class SnippetManager:
             print(f"Snippet {id} not found.")
     
 
-snippets = SnippetManager.search_by_content("My")
-print("Snippets in Updated Category:", snippets)
+# snippets = SnippetManager.search_by_content("My")
+# print("Snippets in Updated Category:", snippets)
+SnippetManager.create("title", "content1", "Testcategory1")
+SnippetManager.create("title", "content1", "Testcategory1")
+SnippetManager.create("title", "content1", "Test3category1")
+SnippetManager.create("title", "content1", "category1")
+SnippetManager.create("title", "content1", "cCategory1")
+
+
+# cat = SnippetManager.get_categories()
+# print("Snippets in Updated Category:", cat)

@@ -55,7 +55,7 @@ class SnippetManager:
     def update(id, title=None, content=None, category=None, is_encrypted=None):
         """Update snippet by ID, only updating provided fields."""
         now = datetime.datetime.now()
-        formated_category = category.lower().title()
+        
     
         cur.execute("""
             UPDATE snippets 
@@ -66,7 +66,7 @@ class SnippetManager:
                 is_encrypted = COALESCE(?, is_encrypted),
                 created_at = ?
             WHERE id == ?
-        """, (title, content, formated_category, is_encrypted, now, id))
+        """, (title, content, category, is_encrypted, now, id))
         
         con.commit()
         print(f"Snippet {id} updated.")
@@ -85,11 +85,11 @@ class SnippetManager:
 
 # snippets = SnippetManager.search_by_content("My")
 # print("Snippets in Updated Category:", snippets)
-SnippetManager.create("title", "content1", "Testcategory1")
-SnippetManager.create("title", "content1", "Testcategory1")
-SnippetManager.create("title", "content1", "Test3category1")
-SnippetManager.create("title", "content1", "category1")
-SnippetManager.create("title", "content1", "cCategory1")
+# SnippetManager.create("title", "content1", "Testcategory1")
+# SnippetManager.create("title", "content1", "Testcategory1")
+# SnippetManager.create("title", "content1", "Test3category1")
+# SnippetManager.create("title", "content1", "category1")
+# SnippetManager.create("title", "content1", "cCategory1")
 
 
 # cat = SnippetManager.get_categories()

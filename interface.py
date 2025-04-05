@@ -1,11 +1,14 @@
 from PyQt6.QtWidgets import *
 from PyQt6 import uic
+import pyperclip
 from snippet_manager import SnippetManager
+from add_snippet_dialog import AddSnippetDialog
 
 class SMGUI(QMainWindow):
     def __init__(self):
         super(SMGUI, self).__init__()
         uic.loadUi("mainwindow.ui", self)
+        self.setWindowTitle("Code Snippet Manager")
         self.load_snippets(SnippetManager.find_all())
         self.load_categories()
         # Connect the item click event
@@ -15,6 +18,8 @@ class SMGUI(QMainWindow):
         
         self.editButton.clicked.connect(self.save_edits)
         self.deleteButton.clicked.connect(self.delete_snippet)
+        self.addButton.clicked.connect(self.add_snippet)
+        self.copyButton.clicked.connect(self.copy_snippet)
         self.show()
         
     def load_snippets(self,snip):
@@ -57,7 +62,12 @@ class SMGUI(QMainWindow):
         print(f"Category clicked: {category}")
         
     
-    # Buttons  
+    # Buttons 
+    def add_snippet(self):
+         dialog = AddSnippetDialog(self)
+         dialog.exec()
+         
+         
     def save_edits(self,item):
         print('Save button clicked!')
         print(item)
@@ -72,7 +82,7 @@ class SMGUI(QMainWindow):
             if snippet_data:
                 new_content=self.snippetTextEdit.toPlainText()
                 if snippet_data != new_content and new_content != '':
-                    SnippetManager.update(snippet_data[0], title=None, content=new_content, category=None, is_encrypted=None)
+                    SnippetManager.update(snippet_data[0], content=new_content)
                     cur_cat_index = self.category.currentIndex()
                     self.display_by_category(cur_cat_index)
                 else:
@@ -83,16 +93,30 @@ class SMGUI(QMainWindow):
         id = current_item.data(256)[0]
         if current_item:
             former_cat=SnippetManager.find_by_id(id)[3]
+            current_index_of_category_drop_down =  self.category.currentIndex()
+            print('former cat',former_cat)
+            print('current_index_of_category_drop_down',current_index_of_category_drop_down)
             SnippetManager.delete(id)
-            print('former_cat',former_cat)
             self.load_snippets(SnippetManager.find_all())
             self.load_categories()
             index = self.category.findText(former_cat)
-            if index != -1:
+            if index != -1 and current_index_of_category_drop_down != 0:
                 self.display_by_category(index)
                 self.category.setCurrentIndex(index)
             else: 
                 self.display_by_category(0)
+                
+    def copy_snippet(self):
+        snippet_body_text = self.snippetTextEdit.toPlainText()
+        self.copy_to_clipboard(snippet_body_text)
+        pos = self.copyButton.mapToGlobal(self.copyButton.rect().topRight())
+        pos.setY(pos.y() - 50)
+        QToolTip.showText(pos, "Copied to clipboard!")
+
+    @staticmethod          
+    def copy_to_clipboard(text):
+        pyperclip.copy(text)
+                
 
 def main():
     app=QApplication([])

@@ -1,13 +1,18 @@
+import sys
+import os
 from PyQt6.QtWidgets import *
 from PyQt6 import uic
 import sys
 from snippet_manager import SnippetManager
 from utils import *
 
+
+ADD_SNIPPET_UI = resource_path("addsnippetdialog.ui")
+
 class AddSnippetDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi("addsnippetdialog.ui", self)
+        uic.loadUi(ADD_SNIPPET_UI, self)
         self.load_categories()
         self.checkBox.stateChanged.connect(self.on_checkbox_changed)
         self.CloseSnipButton.clicked.connect(self.close)

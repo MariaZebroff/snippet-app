@@ -1,6 +1,10 @@
 import sqlite3
+from pathlib import Path
+from utils import *
 
-con=sqlite3.connect(f'./snippet_db.db')
+
+db_path = get_db_path()
+con=sqlite3.connect(str(db_path))
 cur = con.cursor()
 
 #Table created 

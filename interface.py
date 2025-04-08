@@ -1,3 +1,4 @@
+
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QShortcut, QKeySequence
@@ -7,10 +8,15 @@ from utils import *
 from snippet_manager import SnippetManager
 from add_snippet_dialog import AddSnippetDialog
 
+
+
+
+
+
 class SMGUI(QMainWindow):
     def __init__(self):
         super(SMGUI, self).__init__()
-        uic.loadUi("mainwindow.ui", self)
+        uic.loadUi(resource_path("mainwindow.ui"), self)
         self.setWindowTitle("Code Snippet Manager")
         self.load_snippets(SnippetManager.find_all())
         self.load_categories()

@@ -1,3 +1,6 @@
+import sys
+import os
+from pathlib import Path
 from PyQt6.QtWidgets import QToolTip, QMessageBox
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
@@ -40,9 +43,17 @@ def export_to_csv(data, filename):
     except Exception as e:
         print(f"Error exporting to CSV: {e}")
         
-snippets = [
-    {"title": "Hello World", "content": "print('Hello, World!')", "category": "Python"},
-    {"title": "List Comprehension", "content": "[x*x for x in range(5)]", "category": "Python"},
-]
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
-export_to_csv(snippets, "snippets.csv")
+def get_db_path():
+    """Get the correct path to the database file in both dev and bundled mode"""
+    if getattr(sys, 'frozen', False):
+        # Running in PyInstaller bundle
+        base_path = Path(sys._MEIPASS)
+    else:
+        # Running in development
+        base_path = Path(__file__).parent
+    
+    return base_path / "snippet_db.db"

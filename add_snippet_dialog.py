@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import *
 from PyQt6 import uic
 import sys
 from snippet_manager import SnippetManager
+from utils import *
 
 class AddSnippetDialog(QDialog):
     def __init__(self, parent=None):
@@ -11,6 +12,10 @@ class AddSnippetDialog(QDialog):
         self.checkBox.stateChanged.connect(self.on_checkbox_changed)
         self.CloseSnipButton.clicked.connect(self.close)
         self.saveSnipButton.clicked.connect(self.save_snippet)
+        self.assign_cat = ''
+        
+    def get_category_name(self):
+        return self.assign_cat
         
     def load_categories(self):
         """Fetch categories from the database and populate the ComboBox."""
@@ -31,23 +36,24 @@ class AddSnippetDialog(QDialog):
             self.categoryComboBox.setEnabled(True)
             
     def save_snippet(self):
-        category = ''
+        
         title = ''
         content = ''
         if self.checkBox.isChecked():
-            category = self.newCatLineEdit.text()
+            self.assign_cat = self.newCatLineEdit.text()
         else:
            index = self.categoryComboBox.currentIndex()
-           category =self.categoryComboBox.itemText(index) 
-        print('Cat', category)
+           self.assign_cat =self.categoryComboBox.itemText(index) 
+        print('Cat', self.assign_cat)
         snippet_title=self.titleLineEdit.text()
         print('Title', snippet_title)
         snippet_body=self.textEdit.toPlainText()
         print('Body', snippet_body)
-        if snippet_title == '' or snippet_body == '' or category == '':
-            print('Pop up filds are empty')
+        if snippet_title == '' or snippet_body == '' or self.assign_cat == '':
+            show_popup_message("Title, Snippet or Category cannot be empty!")
         else:
-            SnippetManager.create(title=snippet_title, content=snippet_body, category=category)
+            SnippetManager.create(title=snippet_title, content=snippet_body, category=self.assign_cat)
+            self.accept()
             self.close()
         
 if __name__ == "__main__":

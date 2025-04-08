@@ -1,4 +1,6 @@
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6 import uic
 
 from utils import *
@@ -21,6 +23,13 @@ class SMGUI(QMainWindow):
         self.deleteButton.clicked.connect(self.delete_snippet)
         self.addButton.clicked.connect(self.add_snippet)
         self.copyButton.clicked.connect(self.copy_snippet)
+        
+        shortcut = QShortcut(QKeySequence("Meta+C"), self)
+        shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
+        shortcut.activated.connect(lambda: self.copy_snippet())
+        #Manu Export
+        self.actionExport.triggered.connect(self.export_data)
+        self.actionClose.triggered.connect(self.close)
         self.show()
         
     def load_snippets(self,snip, row=0):
@@ -34,8 +43,10 @@ class SMGUI(QMainWindow):
             self.listWidget.addItem(item)
         
         if snippets:
-         self.listWidget.setCurrentRow(row)
+         currentRow = self.listWidget.setCurrentRow(row)
+         print('currentRow from load snip', currentRow)
          corresponding_snippet = self.listWidget.item(row)
+         print('corresponding_snippet from load snip', corresponding_snippet)
          self.display_snippet_content(corresponding_snippet)
 
     def display_snippet_content(self, item):
@@ -67,12 +78,17 @@ class SMGUI(QMainWindow):
     # Buttons 
     def add_snippet(self):
          dialog = AddSnippetDialog(self)
-         dialog.exec()
+         res=dialog.exec()
+         
+         if res == QDialog.DialogCode.Accepted:
+            row = self.listWidget.count()
+            self.load_snippets(SnippetManager.find_all())
+            self.load_categories()
+            self.display_by_category(0, row)
+            print('Accepted')
          
          
     def save_edits(self,item):
-        print('Save button clicked!')
-        print(item)
         current_item = self.listWidget.currentItem()
         current_item_index = self.listWidget.currentRow()
 
@@ -118,6 +134,25 @@ class SMGUI(QMainWindow):
         snippet_body_text = self.snippetTextEdit.toPlainText()
         copy_to_clipboard(snippet_body_text)
         show_action_text(self.copyButton, "Copied to clipboard!")
+        
+    def export_data(self):
+        all_snippets = SnippetManager.find_all()
+        data = []
+        for snippet in all_snippets:
+            clean_obj = {'id': snippet[0], 'title': snippet[1], 'snippet': snippet[2], 'category': snippet[3], 'date': snippet[5]}
+            data.append(clean_obj)
+        self.save_csv_dialog(data) 
+        
+    def save_csv_dialog(self,data):
+        filename, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save CSV",
+            "",  # Default directory or filename
+            "CSV Files (*.csv);;All Files (*)"
+        )
+
+        if filename:
+            export_to_csv(data, filename)
         
                 
 

@@ -16,7 +16,7 @@ A desktop clipboard manager built using PyQt and SQLite/MySQL for storing and ma
 
 1. Clone the repository to your local machine:
    ```bash
-   git clone https://github.com/yourusername/snippet-app.git
+   git clone https://github.com/MariaZebroff/snippet-app.git
    ```
 
 2. Navigate into the project directory:
@@ -34,7 +34,7 @@ A desktop clipboard manager built using PyQt and SQLite/MySQL for storing and ma
 1. **Running the Application**:
    Start the application with the following command:
    ```bash
-   python main.py
+   python interface.py
    ```
 
 2. **Adding a Snippet**:

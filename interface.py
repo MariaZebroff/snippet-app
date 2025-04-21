@@ -46,6 +46,7 @@ class SMGUI(QMainWindow):
         shortcut.activated.connect(lambda: self.copy_snippet())
         #Manu Export
         self.actionExport.triggered.connect(self.export_data)
+        self.actionImport.triggered.connect(self.import_data)
         self.actionClose.triggered.connect(self.close)
         self.show()
         

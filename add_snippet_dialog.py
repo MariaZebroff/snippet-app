@@ -1,5 +1,6 @@
 import sys
 import os
+from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import *
 from PyQt6 import uic
 import sys
@@ -17,6 +18,10 @@ class AddSnippetDialog(QDialog):
         self.checkBox.stateChanged.connect(self.on_checkbox_changed)
         self.CloseSnipButton.clicked.connect(self.close)
         self.saveSnipButton.clicked.connect(self.save_snippet)
+        
+        self.chooseColorButton.clicked.connect(self.open_color_picker)
+        self.selected_color = "#cccccc"  # Default color
+        self.colorPreviewFrame.setStyleSheet(f"background-color: {self.selected_color};")
         self.assign_cat = ''
         
     def get_category_name(self):
@@ -36,9 +41,17 @@ class AddSnippetDialog(QDialog):
         if self.checkBox.isChecked():
             self.newCatLineEdit.setEnabled(True)
             self.categoryComboBox.setEnabled(False)
+            self.chooseColorButton.setEnabled(True)
         else:
             self.newCatLineEdit.setEnabled(False)
             self.categoryComboBox.setEnabled(True)
+            self.chooseColorButton.setEnabled(False)
+            
+    def open_color_picker(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.selected_color = color.name()
+            self.colorPreviewFrame.setStyleSheet(f"background-color: {self.selected_color};")
             
     def save_snippet(self):
         
@@ -46,9 +59,11 @@ class AddSnippetDialog(QDialog):
         content = ''
         if self.checkBox.isChecked():
             self.assign_cat = self.newCatLineEdit.text()
+            chosen_color = self.selected_color
         else:
            index = self.categoryComboBox.currentIndex()
-           self.assign_cat =self.categoryComboBox.itemText(index) 
+           self.assign_cat =self.categoryComboBox.itemText(index)
+           chosen_color = SnippetManager.find_color(self.assign_cat) or "#cccccc" 
         print('Cat', self.assign_cat)
         snippet_title=self.titleLineEdit.text()
         print('Title', snippet_title)
@@ -57,7 +72,7 @@ class AddSnippetDialog(QDialog):
         if snippet_title == '' or snippet_body == '' or self.assign_cat == '':
             show_popup_message("Title, Snippet or Category cannot be empty!")
         else:
-            SnippetManager.create(title=snippet_title, content=snippet_body, category=self.assign_cat)
+            SnippetManager.create(title=snippet_title, content=snippet_body, category=self.assign_cat, color=chosen_color)
             self.accept()
             self.close()
         

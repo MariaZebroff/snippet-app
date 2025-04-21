@@ -6,12 +6,18 @@ import datetime
 class SnippetManager:
 
     @staticmethod  
-    def create(title, content, category, is_encrypted=False):
+    def create(title, content, category, color='cccccc', is_encrypted=False):
         now = datetime.datetime.now()
         formated_category = category.lower().title()
         cur.execute("INSERT INTO snippets (title, content, category, is_encrypted, created_at) VALUES (?, ?, ?, ?, ?)", 
                     (title, content, formated_category, is_encrypted, now))
         con.commit()
+        cur.execute("SELECT * FROM colors WHERE category = ?", (formated_category,))
+        row_existing = cur.fetchone()
+        if not row_existing:
+            cur.execute("INSERT INTO colors (category, color) VALUES (?, ?)", 
+                    (formated_category, color))
+            con.commit()
         
         return cur.lastrowid
 
@@ -76,16 +82,43 @@ class SnippetManager:
     @staticmethod
     def delete(id):
         """Delete snippet by ID."""
-        cur.execute("DELETE FROM snippets WHERE id == ?", (id,))
-        con.commit()
-        
-    
-        if cur.rowcount > 0:
-            print(f"Snippet {id} deleted.")
-        else:
-            print(f"Snippet {id} not found.")
-    
+        cur.execute("SELECT category FROM snippets WHERE id = ?", (id,))
+        deleted_snip_cat_row = cur.fetchone()
 
+        if not deleted_snip_cat_row:
+            print(f"Snippet {id} not found.")
+            return
+
+        deleted_snip_cat = deleted_snip_cat_row[0]
+
+        cur.execute("DELETE FROM snippets WHERE id = ?", (id,))
+        con.commit()
+
+        cur.execute("SELECT * FROM snippets WHERE category = ?", (deleted_snip_cat,))
+        row_existing = cur.fetchone()
+
+        if not row_existing:
+            cur.execute("DELETE FROM colors WHERE category = ?", (deleted_snip_cat,))
+            con.commit()
+
+        print(f"Snippet {id} deleted.")
+
+    
+    @staticmethod        
+    def find_color(category):
+        formated_category = category.lower().title()
+        cur.execute("SELECT color FROM colors WHERE category = ?", (formated_category,))
+        row = cur.fetchone()
+        if row:
+            return row[0]  # return only the color string
+        return None
+        
+# color = SnippetManager.find_color('3')  
+# print(color)
+
+# SnippetManager.create("title", "content1", "2", '#cccccc')
+# SnippetManager.delete(434)
+# SnippetManager.delete(435)
 # snippets = SnippetManager.search_by_content("My")
 # print("Snippets in Updated Category:", snippets)
 # SnippetManager.create("title", "content1", "Testcategory1")

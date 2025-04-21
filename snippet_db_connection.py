@@ -20,5 +20,13 @@ cur = con.cursor()
 #     )
 # """)
 
+# cur.execute("""
+#     CREATE TABLE colors (
+#         id INTEGER PRIMARY KEY AUTOINCREMENT,
+#         category TEXT,
+#         color TEXT
+#     )
+# """)
+
 # Export `cur` and `con`
 __all__ = ['con', 'cur']

@@ -1,7 +1,7 @@
 
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QShortcut, QKeySequence
+from PyQt6.QtGui import QShortcut, QKeySequence, QPainter, QColor, QPixmap, QIcon
 from PyQt6 import uic
 
 from utils import *
@@ -9,6 +9,17 @@ from snippet_manager import SnippetManager
 from add_snippet_dialog import AddSnippetDialog
 
 
+def create_color_icon(color: QColor, size=10):
+    pixmap = QPixmap(size, size)
+    pixmap.fill(Qt.GlobalColor.transparent)
+    
+    painter = QPainter(pixmap)
+    painter.setBrush(color)
+    painter.setPen(Qt.PenStyle.NoPen)
+    painter.drawRect(0, 0, size, size)
+    painter.end()
+    
+    return QIcon(pixmap)
 
 
 
@@ -46,6 +57,14 @@ class SMGUI(QMainWindow):
         for snippet in snippets:
             item = QListWidgetItem(snippet[1])  # snippet[1] = title
             item.setData(256, snippet)  # Store full snippet data in the item
+            category = snippet[3]
+            print('category', category)
+            color_str = SnippetManager.find_color(category)
+            print('color_str', color_str)
+            if color_str:
+                color = QColor(color_str)
+                color_str = color.name()
+                item.setIcon(create_color_icon(color))
             self.listWidget.addItem(item)
         
         if snippets:

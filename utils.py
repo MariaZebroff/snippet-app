@@ -48,12 +48,29 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def get_db_path():
-    """Get the correct path to the database file in both dev and bundled mode"""
+    """Get the correct path to the database file, ensuring it's in a writable location"""
     if getattr(sys, 'frozen', False):
         # Running in PyInstaller bundle
         base_path = Path(sys._MEIPASS)
+        
+        # Get user's application data directory
+        if sys.platform == 'win32':
+            import appdirs
+            app_data_dir = Path(appdirs.user_data_dir(appauthor="YourCompany", appname="YourApp"))
+        else:
+            app_data_dir = Path.home() / ".your_app_name"
+            
+        app_data_dir.mkdir(parents=True, exist_ok=True)
+        db_destination = app_data_dir / "snippet_db.db"
+        
+        # Copy initial database if it doesn't exist
+        if not db_destination.exists():
+            bundled_db = base_path / "snippet_db.db"
+            if bundled_db.exists():
+                import shutil
+                shutil.copyfile(bundled_db, db_destination)
+        
+        return db_destination
     else:
         # Running in development
-        base_path = Path(__file__).parent
-    
-    return base_path / "snippet_db.db"
+        return Path(__file__).parent / "snippet_db.db"

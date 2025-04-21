@@ -12,6 +12,7 @@ class SnippetManager:
         cur.execute("INSERT INTO snippets (title, content, category, is_encrypted, created_at) VALUES (?, ?, ?, ?, ?)", 
                     (title, content, formated_category, is_encrypted, now))
         con.commit()
+        
         return cur.lastrowid
 
     @staticmethod
@@ -69,6 +70,7 @@ class SnippetManager:
         """, (title, content, category, is_encrypted, now, id))
         
         con.commit()
+        
         print(f"Snippet {id} updated.")
 
     @staticmethod
@@ -76,6 +78,7 @@ class SnippetManager:
         """Delete snippet by ID."""
         cur.execute("DELETE FROM snippets WHERE id == ?", (id,))
         con.commit()
+        
     
         if cur.rowcount > 0:
             print(f"Snippet {id} deleted.")

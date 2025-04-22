@@ -20,7 +20,7 @@ class AddSnippetDialog(QDialog):
         self.saveSnipButton.clicked.connect(self.save_snippet)
         
         self.chooseColorButton.clicked.connect(self.open_color_picker)
-        self.selected_color = "#cccccc"  # Default color
+        self.selected_color = ""  # Default color
         self.colorPreviewFrame.setStyleSheet(f"background-color: {self.selected_color};")
         self.assign_cat = ''
         
@@ -60,6 +60,7 @@ class AddSnippetDialog(QDialog):
         if self.checkBox.isChecked():
             self.assign_cat = self.newCatLineEdit.text()
             chosen_color = self.selected_color
+            print('self.selected_color', self.selected_color)
         else:
            index = self.categoryComboBox.currentIndex()
            self.assign_cat =self.categoryComboBox.itemText(index)

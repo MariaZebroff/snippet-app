@@ -2,7 +2,7 @@ import sys
 import os
 from pathlib import Path
 from PyQt6.QtWidgets import QToolTip, QMessageBox
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QPainter, QColor, QPixmap, QIcon
 from PyQt6.QtCore import Qt
 import pyperclip
 import csv
@@ -74,3 +74,15 @@ def get_db_path():
     else:
         # Running in development
         return Path(__file__).parent / "snippet_db.db"
+    
+def create_color_icon(color: QColor, size=10):
+    pixmap = QPixmap(size, size)
+    pixmap.fill(Qt.GlobalColor.transparent)
+    
+    painter = QPainter(pixmap)
+    painter.setBrush(color)
+    painter.setPen(Qt.PenStyle.NoPen)
+    painter.drawRect(0, 0, size, size)
+    painter.end()
+    
+    return QIcon(pixmap)

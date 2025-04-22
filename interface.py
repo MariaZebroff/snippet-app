@@ -10,17 +10,7 @@ from snippet_manager import SnippetManager
 from add_snippet_dialog import AddSnippetDialog
 
 
-def create_color_icon(color: QColor, size=10):
-    pixmap = QPixmap(size, size)
-    pixmap.fill(Qt.GlobalColor.transparent)
-    
-    painter = QPainter(pixmap)
-    painter.setBrush(color)
-    painter.setPen(Qt.PenStyle.NoPen)
-    painter.drawRect(0, 0, size, size)
-    painter.end()
-    
-    return QIcon(pixmap)
+
 
 
 
@@ -217,7 +207,18 @@ class SMGUI(QMainWindow):
             print(f"Error: {e}")
             return None
     def clearData(self):
-        print("Clear Data")
+        reply = QMessageBox.question(
+        self,
+        "Confirm Delete",
+        "Are you sure you want to clear ALL data? This action cannot be undone.",
+        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+        if reply == QMessageBox.StandardButton.Yes:
+            SnippetManager.drop_data()
+            self.statusBar().showMessage("All data cleared.", 5000)
+            self.load_snippets([])  # Or however you refresh your list
+        else:
+            self.statusBar().showMessage("Data deletion canceled.", 3000)
            
     def save_csv_dialog(self,data):
         filename, _ = QFileDialog.getSaveFileName(

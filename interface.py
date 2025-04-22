@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QShortcut, QKeySequence, QPainter, QColor, QPixmap, QIcon
 from PyQt6 import uic
+import pandas as pd
 
 from utils import *
 from snippet_manager import SnippetManager
@@ -168,6 +169,40 @@ class SMGUI(QMainWindow):
             clean_obj = {'id': snippet[0], 'title': snippet[1], 'snippet': snippet[2], 'category': snippet[3], 'date': snippet[5]}
             data.append(clean_obj)
         self.save_csv_dialog(data) 
+        
+    def import_data(self):
+        try:
+            # Open file dialog to select CSV
+            file_path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Open CSV File",
+                "",
+                "CSV Files (*.csv);;All Files (*)"
+            )
+            
+            if file_path:
+                
+                df = pd.read_csv(file_path)
+                
+                # Convert ENTIRE DataFrame to list of dictionaries
+                all_data = df.to_dict('records') 
+                try:
+                    SnippetManager.bulk_load(all_data)
+                    snips = SnippetManager.find_all()
+                    self.load_snippets(snips)
+                    print(f"Success! Loaded {len(all_data)} rows.")
+                    self.statusBar().showMessage(f"Success! Loaded {len(all_data)} rows.", 5000)
+                except Exception as e:
+                    print(f"Error: {e}")
+                    self.statusBar().showMessage("Something went wrong! Check your file.", 5000)       
+                
+                # print(all_data)  # Full data as dictionaries
+                
+                # return all_data  # Return all rows as dictionaries
+                
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
         
     def save_csv_dialog(self,data):
         filename, _ = QFileDialog.getSaveFileName(

@@ -20,6 +20,13 @@ class SnippetManager:
             con.commit()
         
         return cur.lastrowid
+    
+    @classmethod
+    def bulk_load(cl, data):
+        for item in data:
+            formated_category = item["category"].lower().title()
+            cl.create(title=item["title"], content=item["snippet"], category=formated_category)
+            
 
     @staticmethod
     def find_by_id(id):
@@ -102,6 +109,13 @@ class SnippetManager:
             con.commit()
 
         print(f"Snippet {id} deleted.")
+        
+    @staticmethod
+    def drop_data():
+        """Delete all data from the snippets and colors tables, but keep their structure."""
+        cur.execute("DELETE FROM snippets;")
+        cur.execute("DELETE FROM colors;")
+        con.commit()
 
     
     @staticmethod        

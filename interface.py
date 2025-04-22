@@ -41,6 +41,7 @@ class SMGUI(QMainWindow):
         self.deleteButton.clicked.connect(self.delete_snippet)
         self.addButton.clicked.connect(self.add_snippet)
         self.copyButton.clicked.connect(self.copy_snippet)
+        self.searchBar.textChanged.connect(self.on_search_change)
         
         shortcut = QShortcut(QKeySequence("Meta+C"), self)
         shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
@@ -48,8 +49,10 @@ class SMGUI(QMainWindow):
         #Manu Export
         self.actionExport.triggered.connect(self.export_data)
         self.actionImport.triggered.connect(self.import_data)
+        self.actionClear_All_Data.triggered.connect(self.clearData)
         self.actionClose.triggered.connect(self.close)
         self.show()
+        
         
     def load_snippets(self,snip, row=0):
         """Load snippet titles from the database into the QListWidget."""
@@ -92,6 +95,16 @@ class SMGUI(QMainWindow):
         self.category.addItem('All')
         for category in categories:
             self.category.addItem(category.title())
+            
+    def on_search_change(self, text):
+        print("Hi there", text)
+        res=SnippetManager.search_by_content(text)
+        if res != "Not found":
+            self.load_snippets(res)
+        else:
+           self.listWidget.clear() 
+           self.snippetTextEdit.setPlainText("No snippets found!")
+        print(res)
             
     def display_by_category(self, index, snip_index=0):
         self.snippetTextEdit.clear()
@@ -203,7 +216,9 @@ class SMGUI(QMainWindow):
         except Exception as e:
             print(f"Error: {e}")
             return None
-        
+    def clearData(self):
+        print("Clear Data")
+           
     def save_csv_dialog(self,data):
         filename, _ = QFileDialog.getSaveFileName(
             self,

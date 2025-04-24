@@ -1,0 +1,8 @@
+pyinstaller --windowed \
+  --add-data "mainwindow.ui:." \
+  --add-data "addsnippetdialog.ui:." \
+  --add-data "snippet_db.db:." \
+  --icon=Snipster.icns \
+  --name Snipster \
+ interface.py
+

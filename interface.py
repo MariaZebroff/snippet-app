@@ -1,6 +1,6 @@
 
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QShortcut, QKeySequence, QPainter, QColor, QPixmap, QIcon
 from PyQt6 import uic
 import pandas as pd
@@ -19,7 +19,7 @@ class SMGUI(QMainWindow):
     def __init__(self):
         super(SMGUI, self).__init__()
         uic.loadUi(resource_path("mainwindow.ui"), self)
-        self.setWindowTitle("Code Snippet Manager")
+        self.setWindowTitle("Snipster")
         self.load_snippets(SnippetManager.find_all())
         self.load_categories()
         # Connect the item click event
@@ -234,8 +234,11 @@ class SMGUI(QMainWindow):
                 
 
 def main():
-    app=QApplication([])
-    window=SMGUI()
+    app = QApplication([])
+
+    window = SMGUI()
+    window.show() 
+
     app.exec()
 
 if __name__ == '__main__':
